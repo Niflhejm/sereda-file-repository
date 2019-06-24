@@ -14,6 +14,7 @@ import ru.sereda.filerepository.seredafilerepository.services.TelegramService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/repository")
@@ -30,10 +31,10 @@ public class FileRepositoryController {
     }
 
     @RequestMapping(path = "/upload", method = RequestMethod.POST)
-    public String upload(@RequestParam("uploadedFile") MultipartFile uploadedFile) throws IOException {
+    public String upload(@RequestParam("uploadedFile") MultipartFile uploadedFile) throws IOException, URISyntaxException {
         if (!uploadedFile.isEmpty()) {
             fileService.uploadFile(uploadedFile);
-            telegramService.sendMessage("test message from app");
+            telegramService.sendFile(fileService.getFile(uploadedFile.getName()));
             return uploadedFile.getOriginalFilename() + " uploaded.";
         }
         return "file is empty";
