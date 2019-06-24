@@ -34,7 +34,7 @@ public class FileRepositoryController {
     public String upload(@RequestParam("uploadedFile") MultipartFile uploadedFile) throws IOException, URISyntaxException {
         if (!uploadedFile.isEmpty()) {
             fileService.uploadFile(uploadedFile);
-            telegramService.sendFile(fileService.getFile(uploadedFile.getName()));
+            telegramService.sendFile(fileService.getFile(uploadedFile.getOriginalFilename()));
             return uploadedFile.getOriginalFilename() + " uploaded.";
         }
         return "file is empty";
@@ -47,7 +47,6 @@ public class FileRepositoryController {
 
     @RequestMapping(path = "/download/{name}", method = RequestMethod.GET)
     public ResponseEntity<Resource> download(@PathVariable String name) throws IOException {
-
         File file = fileService.getFile(name);
         if (file.exists()) {
             MediaType mediaType = fileService.getMediaType(file);
