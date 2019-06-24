@@ -8,13 +8,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.sereda.filerepository.seredafilerepository.services.FileService;
 import ru.sereda.filerepository.seredafilerepository.services.TelegramService;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/repository")
@@ -31,11 +31,15 @@ public class FileRepositoryController {
     }
 
     @RequestMapping(path = "/upload", method = RequestMethod.POST)
-    public String upload(@RequestParam("uploadedFile") MultipartFile uploadedFile) throws IOException, URISyntaxException {
+    public String upload(@RequestParam("uploadedFile") MultipartFile uploadedFile) throws IOException {
         if (!uploadedFile.isEmpty()) {
             fileService.uploadFile(uploadedFile);
-            telegramService.sendFile(fileService.getFile(uploadedFile.getOriginalFilename()));
-            return uploadedFile.getOriginalFilename() + " uploaded.";
+            try {
+                telegramService.sendDocUploadingAFile(-1001213369643L, fileService.getFile(uploadedFile.getOriginalFilename()));
+            } catch (TelegramApiException e) {
+                return uploadedFile.getOriginalFilename() + " uploaded but failed to send to telegram";
+            }
+            return uploadedFile.getOriginalFilename() + " uploaded and sent to telegram";
         }
         return "file is empty";
     }
@@ -53,7 +57,7 @@ public class FileRepositoryController {
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
             return ResponseEntity.ok()
                     .header("attachment", "filename= +name")
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+name)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + name)
                     .header("Cache-Control", "no-cache, no-store, must-revalidate")
                     .header("Pragma", "no-cache")
                     .header("Expires", "0")
