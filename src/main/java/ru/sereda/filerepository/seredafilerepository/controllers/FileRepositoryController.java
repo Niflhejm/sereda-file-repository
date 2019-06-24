@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.sereda.filerepository.seredafilerepository.services.FileService;
+import ru.sereda.filerepository.seredafilerepository.services.TelegramService;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,6 +21,8 @@ public class FileRepositoryController {
 
     @Autowired
     private FileService fileService;
+    @Autowired
+    private TelegramService telegramService;
 
     @RequestMapping(path = "/upload", method = RequestMethod.GET)
     public String getUploadForm() {
@@ -30,6 +33,7 @@ public class FileRepositoryController {
     public String upload(@RequestParam("uploadedFile") MultipartFile uploadedFile) throws IOException {
         if (!uploadedFile.isEmpty()) {
             fileService.uploadFile(uploadedFile);
+            telegramService.sendMessage("test message from app");
             return uploadedFile.getOriginalFilename() + " uploaded.";
         }
         return "file is empty";
@@ -54,7 +58,6 @@ public class FileRepositoryController {
                     .header("Pragma", "no-cache")
                     .header("Expires", "0")
                     .contentType(mediaType)
-//                    .contentLength(resource.contentLength())
                     .body(resource);
         } else {
             return ResponseEntity.notFound().header("Reason", "File not found").build();
