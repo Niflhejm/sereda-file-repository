@@ -56,6 +56,14 @@ public class FileService {
 
         StringBuilder sb = new StringBuilder();
 
+        sb.append("                \"  <head>\\n\" +\n" +
+                "                \"    <meta charset=\\\"utf-8\\\">\\n\" +\n" +
+                "                \"    <meta http-equiv=\\\"X-UA-Compatible\\\" content=\\\"IE=edge\\\">\\n\" +\n" +
+                "                \"    <meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\">\\n\" +\n" +
+                "                \"    <title>Sereda Repository</title>\\n\" +\n" +
+                "                \"  </head>\\n\" +\n" +
+                "                \"  <body>\\n\" +\n" +
+                "                \"    <h3>Sereda Repository</h3>\\n\" +");
         sb.append("<form method='POST' action=''>");
         sb.append("<select class=\"form-control\" multiple=\"\" required name='name'>");
         list.forEach(s -> sb.append("<option>").append(s).append("</option>"));
