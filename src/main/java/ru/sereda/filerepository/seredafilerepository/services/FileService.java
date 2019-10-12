@@ -25,10 +25,25 @@ public class FileService {
     }
 
     public String getUploadForm() {
-        return "<form method='POST' enctype='multipart/form-data' action=''>" +
-                "     File to upload: <input type='file' required name='uploadedFile'><br />" +
-                "     <input type='submit' value='Upload'> " +
-                "</form>";
+        return "<html lang=\"en\">\n" +
+                "  <head>\n" +
+                "    <meta charset=\"utf-8\">\n" +
+                "    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n" +
+                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
+                "    <title>Sereda Repository</title>\n" +
+                "  </head>\n" +
+                "  <body>\n" +
+                "    <h3>Sereda Repository</h3>\n" +
+                "\n" +
+                "    <form method='POST' enctype='multipart/form-data' action=''>\n" +
+                "                File to upload: <input type='file' required name='uploadedFile'><br />\n" +
+                "                <br />\n" +
+                "                Send to Telegram <input type='checkbox' checked name='sendTelegram'><br />\n" +
+                "                <br />\n" +
+                "                <input  type='submit' value='Upload'>\n" +
+                "                </form>\n" +
+                "  </body>\n" +
+                "</html>";
     }
 
     public void uploadFile(MultipartFile multipartFile) throws IOException {
@@ -42,13 +57,18 @@ public class FileService {
         StringBuilder sb = new StringBuilder();
 
         sb.append("<form method='POST' action=''>");
-        list.forEach(s -> sb.append(s).append("<br />"));
+        sb.append("<select class=\"form-control\" multiple=\"\" required name='name'>");
+        list.forEach(s -> sb.append("<option>").append(s).append("</option>"));
+        sb.append("</select>");
+        sb.append("<br />");
+        sb.append("<br />");
+        sb.append("<input  type='submit' value='Download'>");
         sb.append("</form>");
         return sb.toString();
     }
 
     public File getFile(String name) {
-            return new File(DESTINATION + name);
+        return new File(DESTINATION + name);
     }
 
     public MediaType getMediaType(File file) {

@@ -8,13 +8,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.sereda.filerepository.seredafilerepository.services.FileService;
-import ru.sereda.filerepository.seredafilerepository.services.TelegramService;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
+//import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+//import ru.sereda.filerepository.seredafilerepository.services.TelegramService;
 
 @RestController
 @RequestMapping("/repository")
@@ -22,8 +23,8 @@ public class FileRepositoryController {
 
     @Autowired
     private FileService fileService;
-    @Autowired
-    private TelegramService telegramService;
+//    @Autowired
+//    private TelegramService telegramService;
 
     @RequestMapping(path = "/upload", method = RequestMethod.GET)
     public String getUploadForm() {
@@ -31,26 +32,30 @@ public class FileRepositoryController {
     }
 
     @RequestMapping(path = "/upload", method = RequestMethod.POST)
-    public String upload(@RequestParam("uploadedFile") MultipartFile uploadedFile) throws IOException {
+    public String upload(@RequestParam("uploadedFile") MultipartFile uploadedFile,
+                         @RequestParam(value = "sendTelegram", required = false) boolean sendTelegram) throws IOException {
         if (!uploadedFile.isEmpty()) {
             fileService.uploadFile(uploadedFile);
-            try {
-                telegramService.sendDocUploadingAFile(-1001213369643L, fileService.getFile(uploadedFile.getOriginalFilename()));
-            } catch (TelegramApiException e) {
-                return uploadedFile.getOriginalFilename() + " uploaded but failed to send to telegram";
+            if (sendTelegram) {
+//            try {
+//                telegramService.sendDocUploadingAFile(-1001213369643L, fileService.getFile(uploadedFile.getOriginalFilename()));
+//            } catch (TelegramApiException e) {
+//                return uploadedFile.getOriginalFilename() + " uploaded to repository but failed to send to telegram";
+//            }
+                return uploadedFile.getOriginalFilename() + " uploaded to repository and sent to telegram";
             }
-            return uploadedFile.getOriginalFilename() + " uploaded and sent to telegram";
+            return uploadedFile.getOriginalFilename() + " uploaded to repository";
         }
         return "file is empty";
     }
 
-    @RequestMapping(path = "/filesList", method = RequestMethod.GET)
+    @RequestMapping(path = "/download", method = RequestMethod.GET)
     public String getFilesList() throws IOException {
         return fileService.getDownloadForm();
     }
 
-    @RequestMapping(path = "/download/{name}", method = RequestMethod.GET)
-    public ResponseEntity<Resource> download(@PathVariable String name) throws IOException {
+    @RequestMapping(path = "/download", method = RequestMethod.POST)
+    public ResponseEntity<Resource> download(@RequestParam String name) throws IOException {
         File file = fileService.getFile(name);
         if (file.exists()) {
             MediaType mediaType = fileService.getMediaType(file);
